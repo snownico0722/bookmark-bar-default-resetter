@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Bookmark Bar Default Resetter",
+  "description": "Keeps Chrome's next bookmark folder biased toward the bookmarks bar by touching a temporary bookmark.",
+  "version": "0.1.0",
+  "permissions": ["bookmarks", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
