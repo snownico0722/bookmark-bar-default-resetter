@@ -83,7 +83,9 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onStartup.addListener(() => {
   setSessionState({ importInProgress: false }).finally(() => {
-    scheduleTouch("startup");
+    cleanLeftoverMarkers().catch((error) => {
+      console.warn("Failed to clean leftover bookmark reset markers:", error);
+    });
   });
 });
 
@@ -93,10 +95,16 @@ chrome.bookmarks.onCreated.addListener((_id, node) => {
   scheduleTouch(node.url ? "bookmark-created" : "folder-created");
 });
 
-chrome.bookmarks.onMoved.addListener(() => {
+chrome.bookmarks.onMoved.addListener((id) => {
   if (touching) return;
 
-  scheduleTouch("bookmark-moved");
+  chrome.bookmarks.get(id)
+    .then(([node]) => {
+      if (isMarker(node)) return;
+
+      scheduleTouch("bookmark-moved");
+    })
+    .catch(() => undefined);
 });
 
 chrome.bookmarks.onImportBegan.addListener(() => {
